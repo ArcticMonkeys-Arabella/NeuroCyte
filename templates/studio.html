@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCyte | Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="studio-page">
+
+    <header class="studio-header">
+        <a href="/" class="studio-back">← NeuroCyte</a>
+        <h1>NEUROCYTE <span>STUDIO</span></h1>
+        <p>Choose your character. Make it yours.</p>
+    </header>
+
+    <main class="studio-container">
+
+        <section class="avatar-preview">
+            <div class="section-heading">
+                <h2>Your Avatar</h2>
+                <p>Preview your selected character.</p>
+            </div>
+
+            <div class="avatar-stage">
+                <img id="selectedAvatarPreview" src="" alt="Selected avatar" hidden>
+                <div id="avatarPlaceholder" class="avatar-placeholder">✦</div>
+                <p id="avatarName">YOUR AVATAR</p>
+                <span id="avatarHint">Choose a character below</span>
+            </div>
+        </section>
+
+        <section class="studio-editor">
+            <h2>Choose Your Avatar</h2>
+            <p class="studio-subtitle">Find the character that represents you.</p>
+
+            <div class="avatar-gallery">
+
+                {% for i in range(1, 11) %}
+                <button class="avatar-card"
+                        type="button"
+                        data-avatar="avatar{{ i }}"
+                        data-image="{{ url_for('static', filename='avatars/' ~ avatar_files[i-1]) }}"
+                        onclick="selectAvatar(this)">
+
+                    <img src="{{ url_for('static', filename='avatars/' ~ avatar_files[i-1]) }}"
+                         alt="Avatar {{ i }}">
+
+                    <span>Character {{ i }}</span>
+                </button>
+                {% endfor %}
+
+            </div>
+
+            <button id="saveAvatar" class="save-avatar-btn" disabled>
+                Confirm Selection
+            </button>
+
+            <p id="saveMessage"></p>
+        </section>
+
+    </main>
+
+    <script>
+        let selectedAvatar = null;
+
+        function selectAvatar(card) {
+            document.querySelectorAll('.avatar-card').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            card.classList.add('active');
+
+            selectedAvatar = card.dataset.image;
+
+            document.getElementById('selectedAvatarPreview').src = selectedAvatar;
+            document.getElementById('selectedAvatarPreview').hidden = false;
+            document.getElementById('avatarPlaceholder').hidden = true;
+
+            document.getElementById('avatarName').textContent =
+                card.querySelector('span').textContent;
+
+            document.getElementById('avatarHint').textContent =
+                'Ready to represent you!';
+
+            document.getElementById('saveAvatar').disabled = false;
+        }
+
+        document.getElementById('saveAvatar').addEventListener('click', () => {
+            if (!selectedAvatar) return;
+
+            localStorage.setItem('neurocyteAvatar', selectedAvatar);
+
+            document.getElementById('saveMessage').textContent =
+                'Avatar saved successfully!';
+        });
+    </script>
+
+</body>
+</html>

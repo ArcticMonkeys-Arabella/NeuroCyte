@@ -1,0 +1,860 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Quiz | NeuroCyte</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .quiz-workspace {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .quiz-progress {
+            margin-bottom: 28px;
+        }
+
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            color: #aaa5bd;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .progress-track {
+            height: 7px;
+            background: #252036;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7656e8, #627bff);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        /* PLAYER HUD */
+
+        .player-hud {
+            display: grid;
+            grid-template-columns: 1fr minmax(180px, 1.2fr) auto;
+            align-items: center;
+            gap: 22px;
+            margin: 0 auto 22px;
+            padding: 18px 22px;
+            max-width: 100%;
+            background: linear-gradient(
+                120deg,
+                rgba(31, 24, 54, 0.96),
+                rgba(15, 17, 39, 0.96)
+            );
+            border: 1px solid #393052;
+            border-radius: 16px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+        }
+
+        .player-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .player-avatar {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 14px;
+            color: white;
+            font-size: 19px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #9875ff, #526cff);
+            box-shadow: 0 0 20px rgba(118, 86, 232, 0.25);
+        }
+
+        .player-details,
+        .player-streak > div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .player-name {
+            color: #f5f3ff;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .player-level,
+        .xp-details,
+        .player-streak span:last-child {
+            color: #aaa5bd;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .player-xp {
+            min-width: 0;
+        }
+
+        .xp-details {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        #xpText {
+            color: #d8ceff;
+            white-space: nowrap;
+        }
+
+        .xp-track {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #29233d;
+        }
+
+        .xp-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #9b75ff, #5d8cff);
+            box-shadow: 0 0 12px rgba(125, 104, 255, 0.45);
+            transition: width 0.35s ease;
+        }
+
+        .player-streak {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding-left: 18px;
+            border-left: 1px solid #393052;
+        }
+
+        .streak-icon {
+            font-size: 23px;
+        }
+
+        .player-streak strong {
+            color: #fff;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        /* QUESTION CARD */
+
+        .quiz-question-card {
+            padding: 35px;
+            background: linear-gradient(145deg, #171326, #0d0b17);
+            border: 1px solid #393052;
+            border-radius: 17px;
+        }
+
+        .question-tag {
+            color: #a999ff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-question-card h2 {
+            font-size: 23px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .answer-list {
+            display: grid;
+            gap: 13px;
+        }
+
+        .answer-option {
+            width: 100%;
+            padding: 17px 19px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            background: #100d1d;
+            border: 1px solid #393052;
+            border-radius: 11px;
+            color: #e4dfff;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .answer-option:hover {
+            border-color: #8871ff;
+            background: #19142b;
+        }
+
+        .answer-option.selected {
+            border-color: #9b80ff;
+            background: rgba(118, 86, 232, 0.17);
+            box-shadow: 0 0 15px rgba(118, 86, 232, 0.12);
+        }
+
+        .answer-letter {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: #252036;
+            color: #b9a5ff;
+            font-weight: 700;
+        }
+
+        .answer-option.selected .answer-letter {
+            background: #7656e8;
+            color: white;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 28px;
+        }
+
+        .quiz-btn {
+            padding: 13px 24px;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quiz-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .previous-btn {
+            background: transparent;
+            border: 1px solid #393052;
+            color: #e4dfff;
+        }
+
+        .next-btn {
+            background: linear-gradient(120deg, #7656e8, #4936a9);
+            border: none;
+            color: white;
+        }
+
+        .quiz-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+        }
+
+        /* RESULTS */
+
+        .result-card {
+            display: none;
+            padding: 45px 30px;
+            text-align: center;
+            background: linear-gradient(145deg, #171326, #0d0b17);
+            border: 1px solid #393052;
+            border-radius: 17px;
+        }
+
+        .result-score {
+            font-size: 65px;
+            font-weight: 800;
+            letter-spacing: -3px;
+            margin: 20px 0;
+            background: linear-gradient(90deg, #a68cff, #627bff);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .result-card p {
+            color: #aaa5bd;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .restart-btn {
+            margin-top: 25px;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 9px;
+            color: white;
+            background: linear-gradient(120deg, #7656e8, #4936a9);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .restart-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .demo-note {
+            color: #777187;
+            font-size: 11px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 650px) {
+            .player-hud {
+                grid-template-columns: 1fr auto;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .player-xp {
+                grid-column: 1 / -1;
+                grid-row: 2;
+            }
+
+            .player-streak {
+                padding-left: 14px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-question-card {
+                padding: 24px 18px;
+            }
+
+            .quiz-question-card h2 {
+                font-size: 19px;
+            }
+
+            .result-score {
+                font-size: 52px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<section class="quiz-page">
+
+    <nav class="navbar">
+        <h2 class="logo">NeuroCyte<span>.</span></h2>
+        <a href="/" class="back-link">← Back to Home</a>
+    </nav>
+
+    <main class="quiz-container">
+
+        <div class="quiz-heading">
+            <p class="section-label">NEUROCYTE / QUIZ MODE</p>
+            <h1>Your challenge awaits.</h1>
+            <p>Focus up. Take your time. Trust your knowledge.</p>
+        </div>
+
+        <div class="quiz-info">
+
+            <div class="info-card">
+                <span>TOPIC</span>
+                <h3>{{ topic }}</h3>
+            </div>
+
+            <div class="info-card">
+                <span>DIFFICULTY</span>
+                <h3>{{ difficulty }}</h3>
+            </div>
+
+            <div class="info-card">
+                <span>MODE</span>
+                <h3>Practice</h3>
+            </div>
+
+        </div>
+
+        <div class="quiz-workspace" id="quizWorkspace">
+
+            <!-- PLAYER HUD -->
+
+            <div class="player-hud">
+
+                <div class="player-profile">
+                    <div class="player-avatar" id="playerAvatar">N</div>
+
+                    <div class="player-details">
+                        <span class="player-name">PLAYER ONE</span>
+                        <span class="player-level">LEVEL 01</span>
+                    </div>
+                </div>
+
+                <div class="player-xp">
+                    <div class="xp-details">
+                        <span>EXPERIENCE</span>
+                        <span id="xpText">0 / 100 XP</span>
+                    </div>
+
+                    <div class="xp-track">
+                        <div class="xp-fill" id="xpFill"></div>
+                    </div>
+                </div>
+
+                <div class="player-streak">
+                    <span class="streak-icon">🔥</span>
+
+                    <div>
+                        <strong id="streakCount">0</strong>
+                        <span>STREAK</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- QUESTION PROGRESS -->
+
+            <div class="quiz-progress">
+
+                <div class="progress-details">
+                    <span id="questionCounter">QUESTION 01 / 05</span>
+                    <span id="progressPercent">20%</span>
+                </div>
+
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+            </div>
+
+            <!-- QUESTION CARD -->
+
+            <div class="quiz-question-card">
+
+                <p class="question-tag" id="questionTag">QUESTION 01</p>
+
+                <h2 id="questionText"></h2>
+
+                <div class="answer-list" id="answerList"></div>
+
+                <div class="quiz-controls">
+
+                    <button
+                        class="quiz-btn previous-btn"
+                        id="previousBtn"
+                        onclick="previousQuestion()">
+                        ← Previous
+                    </button>
+
+                    <button
+                        class="quiz-btn next-btn"
+                        id="nextBtn"
+                        onclick="nextQuestion()">
+                        Next →
+                    </button>
+
+                </div>
+
+            </div>
+
+            <p class="demo-note" id="quizStatus">
+                CONNECTING TO NEUROCYTE AI...
+            </p>
+
+        </div>
+
+        <!-- RESULTS -->
+
+        <div class="result-card" id="resultCard">
+
+            <p class="section-label">QUIZ COMPLETED</p>
+
+            <h2>Your results are in.</h2>
+
+            <div class="result-score" id="resultScore">0/5</div>
+
+            <p id="resultMessage"></p>
+
+            <button
+                class="restart-btn"
+                id="restartBtn"
+                onclick="restartQuiz()">
+                ↻ Try Again
+            </button>
+
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 NeuroCyte. Learn Smarter. Test Better.</p>
+    </footer>
+
+</section>
+
+<script>
+
+const topic = {{ topic | tojson }};
+const grade = {{ grade | tojson }};
+const difficulty = {{ difficulty | tojson }};
+const questionCount = {{ question_count | default(5) | int | tojson }};
+
+let questions = [];
+let currentQuestion = 0;
+let userAnswers = [];
+let submittedAnswers = [];
+
+const questionText = document.getElementById("questionText");
+const answerList = document.getElementById("answerList");
+const questionCounter = document.getElementById("questionCounter");
+const questionTag = document.getElementById("questionTag");
+const progressFill = document.getElementById("progressFill");
+const progressPercent = document.getElementById("progressPercent");
+const quizStatus = document.getElementById("quizStatus");
+
+
+// LOAD QUIZ FROM API
+
+async function loadQuiz() {
+
+    quizStatus.textContent = "GENERATING YOUR AI QUIZ...";
+    questionText.textContent = "Preparing your questions...";
+    answerList.innerHTML = "";
+
+    document.getElementById("previousBtn").disabled = true;
+    document.getElementById("nextBtn").disabled = true;
+
+    try {
+
+        const response = await fetch("/api/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                topic: topic,
+                grade: grade,
+                difficulty: difficulty,
+                question_count: questionCount
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || "Quiz generation failed.");
+        }
+
+        questions = data.quiz.questions.map(item => {
+
+            const options = item.options.map(String);
+
+            const answerIndex = options.findIndex(
+                option => option.trim() === String(item.answer).trim()
+            );
+
+            if (
+                !item.question ||
+                options.length !== 4 ||
+                answerIndex === -1
+            ) {
+                throw new Error("The AI returned an invalid question.");
+            }
+
+            return {
+                question: item.question,
+                options: options,
+                answer: answerIndex,
+                explanation: item.explanation || ""
+            };
+
+        });
+
+        if (questions.length !== questionCount) {
+            throw new Error("The AI returned an incorrect number of questions.");
+        }
+
+        userAnswers = new Array(questions.length).fill(null);
+submittedAnswers = new Array(questions.length).fill(null);
+currentQuestion = 0;
+
+        quizStatus.textContent =
+            "AI GENERATED QUIZ · POWERED BY GEMINI";
+
+        renderQuestion();
+
+    } catch (error) {
+
+        console.error("Quiz generation error:", error);
+
+        questions = [];
+        userAnswers = [];
+
+        quizStatus.textContent = "QUIZ GENERATION FAILED";
+        questionText.textContent = error.message;
+        answerList.innerHTML = "";
+
+        document.getElementById("nextBtn").disabled = true;
+
+    }
+
+}
+
+
+// PLAYER HUD
+
+function updatePlayerHUD() {
+
+    const correctAnswers = questions.reduce((total, question, index) => {
+        return total + (
+            submittedAnswers[index] === question.answer ? 1 : 0
+        );
+    }, 0);
+
+    const totalXP = correctAnswers * 20;
+    const level = Math.floor(totalXP / 100) + 1;
+    const xpWithinLevel = totalXP % 100;
+
+    document.getElementById("xpText").textContent =
+        `${xpWithinLevel} / 100 XP`;
+
+    document.getElementById("xpFill").style.width =
+        `${xpWithinLevel}%`;
+
+    document.querySelector(".player-level").textContent =
+        `LEVEL ${String(level).padStart(2, "0")}`;
+
+    let streak = 0;
+
+    for (let i = 0; i < submittedAnswers.length; i++) {
+
+        if (submittedAnswers[i] === null) break;
+
+        if (submittedAnswers[i] === questions[i].answer) {
+            streak++;
+        } else {
+            streak = 0;
+        }
+    }
+
+    document.getElementById("streakCount").textContent = streak;
+}
+
+   
+  
+
+
+
+
+// DISPLAY QUESTIONS
+
+function renderQuestion() {
+
+    if (!questions.length) return;
+
+    updatePlayerHUD();
+
+    const question = questions[currentQuestion];
+
+    questionText.textContent = question.question;
+
+    questionCounter.textContent =
+        `QUESTION ${String(currentQuestion + 1).padStart(2, "0")} / ${String(questions.length).padStart(2, "0")}`;
+
+    questionTag.textContent =
+        `QUESTION ${String(currentQuestion + 1).padStart(2, "0")}`;
+
+    const progress =
+        ((currentQuestion + 1) / questions.length) * 100;
+
+    progressFill.style.width = progress + "%";
+    progressPercent.textContent = Math.round(progress) + "%";
+
+    answerList.innerHTML = "";
+
+    question.options.forEach((option, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "answer-option";
+        button.type = "button";
+
+        if (userAnswers[currentQuestion] === index) {
+            button.classList.add("selected");
+        }
+
+        const letter = document.createElement("span");
+        letter.className = "answer-letter";
+        letter.textContent = String.fromCharCode(65 + index);
+
+        const text = document.createElement("span");
+        text.textContent = option;
+
+        button.appendChild(letter);
+        button.appendChild(text);
+
+        button.addEventListener("click", () => {
+
+            userAnswers[currentQuestion] = index;
+
+            renderQuestion();
+
+        });
+
+        answerList.appendChild(button);
+
+    });
+
+    document.getElementById("previousBtn").disabled =
+        currentQuestion === 0;
+
+    const nextBtn = document.getElementById("nextBtn");
+
+    nextBtn.disabled = false;
+
+    nextBtn.textContent =
+        currentQuestion === questions.length - 1
+            ? "Finish Quiz ✓"
+            : "Next →";
+
+}
+
+
+// NAVIGATION
+
+function previousQuestion() {
+
+    if (currentQuestion > 0) {
+
+        currentQuestion--;
+
+        renderQuestion();
+
+    }
+
+}
+
+function nextQuestion() {
+
+    if (userAnswers[currentQuestion] === null) {
+        alert("Please select an answer first!");
+        return;
+    }
+
+    // Submit the selected answer
+    submittedAnswers[currentQuestion] = userAnswers[currentQuestion];
+
+    updatePlayerHUD();
+
+    if (currentQuestion < questions.length - 1) {
+
+        currentQuestion++;
+        renderQuestion();
+
+    } else {
+
+        finishQuiz();
+
+    }
+}
+
+
+
+// RESULTS
+
+function finishQuiz() {
+
+    const score = questions.reduce((total, question, index) => {
+
+        return total + (
+            userAnswers[index] === question.answer ? 1 : 0
+        );
+
+    }, 0);
+
+    updatePlayerHUD();
+
+    document.getElementById("quizWorkspace").style.display = "none";
+
+    const resultCard = document.getElementById("resultCard");
+
+    resultCard.style.display = "block";
+
+    document.getElementById("resultScore").textContent =
+        `${score}/${questions.length}`;
+
+    let message;
+
+    if (score === questions.length) {
+
+        message =
+            "Perfect score! You've mastered this practice round.";
+
+    } else if (score >= questions.length * 0.6) {
+
+        message =
+            "Great effort! Keep practising and building your knowledge.";
+
+    } else {
+
+        message =
+            "Every attempt is progress. Review, practise, and try again!";
+
+    }
+
+    document.getElementById("resultMessage").textContent = message;
+
+}
+
+
+// RESTART WITH A FRESH QUIZ
+
+ async function restartQuiz() {
+
+    const restartBtn = document.getElementById("restartBtn");
+
+    restartBtn.disabled = true;
+    restartBtn.textContent = "Generating new quiz...";
+
+    currentQuestion = 0;
+    questions = [];
+    userAnswers = [];
+    submittedAnswers = [];
+
+    document.getElementById("xpText").textContent = "0 / 100 XP";
+    document.getElementById("xpFill").style.width = "0%";
+    document.querySelector(".player-level").textContent = "LEVEL 01";
+    document.getElementById("streakCount").textContent = "0";
+
+    progressFill.style.width = "0%";
+    progressPercent.textContent = "0%";
+
+    document.getElementById("resultCard").style.display = "none";
+    document.getElementById("quizWorkspace").style.display = "block";
+
+    await loadQuiz();
+
+    restartBtn.disabled = false;
+    restartBtn.textContent = "↻ Try Again";
+}
+
+
+// START
+
+loadQuiz();
+
+</script>
+
+</body>
+</html>
