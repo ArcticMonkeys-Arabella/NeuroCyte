@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NeuroCyte | Enter the Future</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body class="home-page">
+
+    <nav class="navbar">
+        <a href="#home" class="logo">Neuro<span>Cyte.</span></a>
+
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#generator">Generator</a>
+            <a href="/studio">Studio</a>
+        </div>
+
+        <a href="/studio" class="profile-avatar">
+            <img id="dashboardAvatar" src="" alt="Your avatar" hidden>
+            <span id="avatarFallback">✦</span>
+        </a>
+    </nav>
+
+    <main id="home">
+
+        <!-- HERO SECTION -->
+
+        <section class="cyber-hero">
+
+            <div class="hero-stars"></div>
+
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+
+            <div class="hero-content">
+
+                <div class="cyber-tag">
+                    ✦ THE FUTURE OF SMART LEARNING
+                </div>
+
+                <p class="pixel-label">WELCOME TO YOUR NEXT LEVEL</p>
+
+                <h1>
+                    THINK<br>
+                    SMARTER.<br>
+                    <span>PLAY BIGGER.</span>
+                </h1>
+
+                <p class="cyber-description">
+                    Your knowledge is your superpower.
+                    Turn study material into AI-powered challenges,
+                    collect knowledge and level up with NeuroCyte.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="#generator" class="cyber-button">
+                        START YOUR QUEST <span>↗</span>
+                    </a>
+
+                    <a href="#features" class="cyber-outline-button">
+                        EXPLORE WORLD
+                    </a>
+
+                </div>
+
+                <div class="hero-coordinates">
+                    <span>NC // SYSTEM ONLINE</span>
+                    <span>EST. 2026</span>
+                </div>
+
+            </div>
+
+            <div class="cyber-sun"></div>
+
+            <div class="cyber-grid"></div>
+
+            <div class="hero-bottom">
+                <span>LEARN ✦ PLAY ✦ GROW</span>
+                <span>YOUR JOURNEY STARTS HERE</span>
+            </div>
+
+        </section>
+
+        <!-- FEATURES -->
+
+        <section class="cyber-features" id="features">
+
+            <div class="cyber-section-heading">
+                <p class="pixel-label">01 // THE NEUROCYTE EXPERIENCE</p>
+                <h2>LEVEL UP YOUR <span>LEARNING.</span></h2>
+                <p>
+                    Not another study tool. A whole new way to learn.
+                </p>
+            </div>
+
+            <div class="cyber-feature-grid">
+
+                <div class="cyber-feature-card">
+                    <div class="cyber-feature-number">01</div>
+                    <div class="cyber-feature-icon">✧</div>
+                    <h3>AI QUEST GENERATOR</h3>
+                    <p>
+                        Transform any topic into intelligent,
+                        interactive quizzes powered by AI.
+                    </p>
+                    <span class="feature-status">SYSTEM ACTIVE</span>
+                </div>
+
+                <div class="cyber-feature-card">
+                    <div class="cyber-feature-number">02</div>
+                    <div class="cyber-feature-icon">◈</div>
+                    <h3>SMART ASSESSMENT</h3>
+                    <p>
+                        Challenge your understanding and discover
+                        what you know and what you can improve.
+                    </p>
+                    <span class="feature-status">SYSTEM ACTIVE</span>
+                </div>
+
+                <div class="cyber-feature-card">
+                    <div class="cyber-feature-number">03</div>
+                    <div class="cyber-feature-icon">⌁</div>
+                    <h3>YOUR OWN AVATAR</h3>
+                    <p>
+                        Create your learning identity and make
+                        your NeuroCyte experience your own.
+                    </p>
+                    <span class="feature-status">SYSTEM ACTIVE</span>
+                    <a href="/studio" class="feature-link">ENTER STUDIO ↗</a>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- GENERATOR -->
+
+        <section class="cyber-generator" id="generator">
+
+            <div class="generator-decoration">✦</div>
+
+            <p class="pixel-label">02 // QUEST CREATION TERMINAL</p>
+
+            <h2>READY TO <span>PLAY?</span></h2>
+
+            <p class="generator-intro">
+                Choose your topic. Set your difficulty.
+                Your next challenge is waiting.
+            </p>
+
+            <form id="quiz-form" action="/generate" method="POST">
+
+               
+
+<div class="form-group">
+    <label for="topic">01 // YOUR TOPIC</label>
+
+    <input
+        type="text"
+        id="topic"
+        name="topic"
+        placeholder="Enter a topic..."
+        maxlength="150"
+        required
+    >
+</div>
+
+<div class="form-group">
+    <label for="grade">02 // YOUR GRADE / STANDARD</label>
+
+    <select id="grade" name="grade" required>
+        <option value="" disabled selected>SELECT YOUR GRADE</option>
+        <option value="Grade 1">GRADE 1</option>
+        <option value="Grade 2">GRADE 2</option>
+        <option value="Grade 3">GRADE 3</option>
+        <option value="Grade 4">GRADE 4</option>
+        <option value="Grade 5">GRADE 5</option>
+        <option value="Grade 6">GRADE 6</option>
+        <option value="Grade 7">GRADE 7</option>
+        <option value="Grade 8">GRADE 8</option>
+        <option value="Grade 9">GRADE 9</option>
+        <option value="Grade 10">GRADE 10</option>
+        <option value="Grade 11">GRADE 11</option>
+        <option value="Grade 12">GRADE 12</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="difficulty">03 // DIFFICULTY LEVEL</label>
+
+    <select id="difficulty" name="difficulty" required>
+        <option value="Easy">EASY // BEGINNER</option>
+        <option value="Medium" selected>MEDIUM // INTERMEDIATE</option>
+        <option value="Hard">HARD // EXPERT</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="question-count">04 // NUMBER OF QUESTIONS</label>
+
+    <input
+        type="number"
+        id="question-count"
+        name="question_count"
+        min="1"
+        max="20"
+        value="10"
+        required
+    >
+</div>
+
+
+                <button type="submit" id="generate-button">
+                    GENERATE YOUR QUEST ↗
+                </button>
+
+                <p id="generator-message" aria-live="polite"></p>
+
+            </form>
+
+            <div class="generator-footer">
+                <span>✦ POWERED BY AI</span>
+                <span>MAXIMUM 20 QUESTIONS</span>
+            </div>
+
+        </section>
+
+        <!-- FOOTER -->
+
+    </main>
+
+    <footer class="cyber-footer">
+
+        <div>
+            <div class="logo">Neuro<span>Cyte.</span></div>
+            <p>THE FUTURE OF SMART LEARNING.</p>
+        </div>
+
+        <div class="footer-right">
+            <span>LEARN ✦ PLAY ✦ GROW</span>
+            <span>NEUROCYTE © 2026</span>
+        </div>
+
+    </footer>
+
+    <script>
+        // LOAD SAVED AVATAR
+
+        const savedAvatar = localStorage.getItem("neurocyteAvatar");
+
+        const dashboardAvatar = document.getElementById("dashboardAvatar");
+        const avatarFallback = document.getElementById("avatarFallback");
+
+        if (savedAvatar) {
+            dashboardAvatar.src = savedAvatar;
+            dashboardAvatar.hidden = false;
+            avatarFallback.hidden = true;
+        }
+
+        // GENERATOR FEEDBACK
+
+        const quizForm = document.getElementById("quiz-form");
+        const message = document.getElementById("generator-message");
+        const generateButton = document.getElementById("generate-button");
+
+        quizForm.addEventListener("submit", function(event) {
+
+            const count = Number(
+                document.getElementById("question-count").value
+            );
+
+            if (count < 1 || count > 20) {
+                event.preventDefault();
+                message.textContent = "Please choose between 1 and 20 questions.";
+                return;
+            }
+
+            message.textContent = "✦ GENERATING YOUR QUEST...";
+
+            generateButton.disabled = true;
+            generateButton.textContent = "LOADING YOUR QUEST...";
+        });
+    </script>
+
+</body>
+</html>
